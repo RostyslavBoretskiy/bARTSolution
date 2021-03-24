@@ -1,0 +1,73 @@
+﻿using AutoMapper;
+
+using bARTSolution.Domain.Data.Core;
+using bARTSolution.Domain.Data.Entities;
+using bARTSolution.Domain.Infrastructure.Models;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
+{
+    public class IncidentRepository : IIncidentRepository
+    {
+        private readonly IGenericRepository<Incident> incidentRepository;
+
+        private readonly IMapper mapper;
+
+        public IncidentRepository(IGenericRepository<Incident> incidentRepository, IMapper mapper)
+        {
+            this.incidentRepository = incidentRepository;
+
+            this.mapper = mapper;
+        }
+
+        public async Task<IncidentModel> CreateAsync(IncidentModel model)
+        {
+            var item = mapper.Map<Incident>(model);
+
+            var result = await incidentRepository.CreateAsync(item);
+
+            return mapper.Map<IncidentModel>(result);
+        }
+
+        public async Task<ResultModel> DeleteAsync(IncidentModel model)
+        {
+            var item = mapper.Map<Incident>(model);
+
+            var result = await incidentRepository.RemoveAsync(item);
+
+            return new ResultModel(result);
+        }
+
+        public async Task<ResultModel> DeleteAsync(string name)
+        {
+            var result = await incidentRepository.RemoveAsync(name);
+
+            return new ResultModel(result);
+        }
+
+        public IEnumerable<IncidentModel> GetAll()
+        {
+            var result = mapper.Map<IEnumerable<IncidentModel>>(incidentRepository.Get());
+
+            return result;
+        }
+
+        public async Task<IncidentModel> GetByNameAsync(string name)
+        {
+            var result = await incidentRepository.FindAsync(name);
+
+            return mapper.Map<IncidentModel>(result);
+        }
+
+        public async Task<ResultModel> UpdateAsync(IncidentModel model)
+        {
+            var item = mapper.Map<Incident>(model);
+
+            var result = await incidentRepository.UpdateAsync(item);
+
+            return new ResultModel(result);
+        }
+    }
+}
