@@ -41,6 +41,11 @@ namespace bARTSolution.Domain.Services.Implementation
             return await accountRepository.GetByIdAsync(id);
         }
 
+        public async Task<AccountModel> GetAccountAsync(string name)
+        {
+            return await accountRepository.GetByNameAsync(name);
+        }
+
         public async Task<IEnumerable<AccountModel>> GetAccountsAsync()
         {
             return await accountRepository.GetAllAsync();

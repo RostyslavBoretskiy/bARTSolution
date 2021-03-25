@@ -13,7 +13,6 @@ namespace bARTSolution.Domain.Infrastructure.Mapper.Profiles
         {
             CreateMap<Contact, ContactModel>();
             CreateMap<ContactModel, Contact>();
-            CreateMap<IEnumerable<Contact>, IEnumerable<ContactModel>>();
         }
     }
 }

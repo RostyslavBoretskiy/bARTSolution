@@ -43,9 +43,9 @@ namespace bARTSolution.Domain.Services.Implementation
             return await contactRepository.GetByEmailAsync(email);
         }
 
-        public Task<IEnumerable<ContactModel>> GetContactByEmailsAsync(IEnumerable<string> emails)
+        public async Task<IEnumerable<ContactModel>> GetContactByEmailsAsync(IEnumerable<string> emails)
         {
-            throw new System.NotImplementedException();
+            return await contactRepository.GetByEmailsAsync(emails);
         }
 
         public async Task<ContactModel> GetContactByIdAsync(int id)

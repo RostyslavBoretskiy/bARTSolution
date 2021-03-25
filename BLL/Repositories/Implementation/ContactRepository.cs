@@ -63,6 +63,14 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
             return mapper.Map<ContactModel>(result.FirstOrDefault());
         }
 
+        public async Task<IEnumerable<ContactModel>> GetByEmailsAsync(IEnumerable<string> emails)
+        {
+            var result = await contactRepository
+                .GetAsync(c => emails.Any(a => a == c.Email));
+
+            return mapper.Map<IEnumerable<ContactModel>>(result);
+        }
+
         public async Task<ContactModel> GetByIdAsync(int id)
         {
             var result = await contactRepository.FindAsync(id);

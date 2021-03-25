@@ -1,6 +1,7 @@
 ﻿using bARTSolution.Domain.Infrastructure.Models;
 using bARTSolution.Domain.Infrastructure.Repositories;
 using bARTSolutionWeb.Domain.Services.Models;
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,18 +11,18 @@ namespace bARTSolution.Domain.Services.Implementation
     public class IncidentService : IIncidentService
     {
         private readonly IIncidentRepository incidentRepository;
-        private readonly IAccountRepository accountRepository;
+        private readonly IAccountService accountService;
         private readonly IContactService contactService;
         private readonly ITransactionService transactionService;
 
         public IncidentService(
-            IIncidentRepository incidentRepository, 
-            IAccountRepository accountRepository,
+            IIncidentRepository incidentRepository,
+            IAccountService accountService,
             IContactService contactService,
             ITransactionService transactionService)
         {
             this.incidentRepository = incidentRepository;
-            this.accountRepository = accountRepository;
+            this.accountService = accountService;
             this.contactService = contactService;
             this.transactionService = transactionService;
         }
@@ -30,7 +31,9 @@ namespace bARTSolution.Domain.Services.Implementation
         {
             transactionService.Begin();
 
-            var account = await accountRepository.GetByNameAsync(model.AccountName);
+            bool isCreatingCorrect = false;
+
+            var account = await accountService.GetAccountAsync(model.AccountName);
             var contact = await contactService.GetContactByEmailAsync(model.Email);
 
             if (account == null)
@@ -38,31 +41,39 @@ namespace bARTSolution.Domain.Services.Implementation
 
             var contactModel = new ContactModel()
             {
-                AccountId = account.AccountId,
                 Email = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName
             };
             if (contact == null)
             {
-                await contactService.CreateContactAsync(contactModel);
+                contact = await contactService.CreateContactAsync(contactModel);
+                if (contact != null)
+                    isCreatingCorrect = true;
             }
             else
             {
                 contactModel.ContactId = contact.ContactId;
-                await contactService.UpdateContactAsync(contactModel);
+                var updatedContactResult = await contactService.UpdateContactAsync(contactModel);
+                isCreatingCorrect = updatedContactResult.IsDone;
             }
 
             if (!account.Contacts.Any(c => c.ContactId.Equals(contact.ContactId)))
             {
-                account.Contacts.ToList().Add(contact);
-                await accountRepository.UpdateAsync(account); 
+                account.Contacts = new List<ContactModel>() { contact };
+                var updatedAccountResult = await accountService.UpdateAccountAsync(account);
+                isCreatingCorrect = updatedAccountResult.IsDone;
             }
 
-            var incident = await incidentRepository.GetByNameAsync(account.IncidentName);
-            incident.Description = model.Description;
+            var acc2 = account;
+            var incident = new IncidentModel() { Accounts = new List<AccountModel>() { acc2 }, Description = model.Description };
 
-            await incidentRepository.UpdateAsync(incident);
+            await incidentRepository.CreateAsync(incident);
+
+            if (isCreatingCorrect)
+                transactionService.Commit();
+            else
+                transactionService.Rollback();
 
             return incident;
         }

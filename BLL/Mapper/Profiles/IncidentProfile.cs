@@ -13,7 +13,6 @@ namespace bARTSolution.Domain.Infrastructure.Mapper.Profiles
         {
             CreateMap<Incident, IncidentModel>();
             CreateMap<IncidentModel, Incident>();
-            CreateMap<IEnumerable<Incident>, IEnumerable<IncidentModel>>();
         }
     }
 }

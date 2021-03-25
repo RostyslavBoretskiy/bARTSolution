@@ -9,6 +9,7 @@ namespace bARTSolution.Domain.Services
     {
         Task<IEnumerable<AccountModel>> GetAccountsAsync();
         Task<AccountModel> GetAccountAsync(int id);
+        Task<AccountModel> GetAccountAsync(string name);
         Task<AccountModel> CreateAccountAsync(CreateAccountModel model);
         Task<ResultModel> UpdateAccountAsync(AccountModel model);
         Task<ResultModel> DeleteAccountAsync(int id);
