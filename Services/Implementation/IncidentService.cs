@@ -29,18 +29,21 @@ namespace bARTSolution.Domain.Services.Implementation
 
         public async Task<IncidentModel> CreateIncidentAsync(CreateIncidentModel model)
         {
-            transactionService.Begin();
+            //transactionService.Begin();
 
             bool isCreatingCorrect = false;
 
-            var account = await accountService.GetAccountAsync(model.AccountName);
-            var contact = await contactService.GetContactByEmailAsync(model.Email);
+            var account222 = await accountService.GetAccountsAsync();
+            var account = account222.FirstOrDefault(f => f.Name == model.AccountName);
+            var contact222 = await contactService.GetContactsAsync();
+            var contact = contact222.FirstOrDefault(f => f.Email == model.Email);
 
             if (account == null)
                 return null;
 
             var contactModel = new ContactModel()
             {
+                AccountId = account.AccountId,
                 Email = model.Email,
                 FirstName = model.FirstName,
                 LastName = model.LastName
@@ -58,17 +61,20 @@ namespace bARTSolution.Domain.Services.Implementation
                 isCreatingCorrect = updatedContactResult.IsDone;
             }
 
-            if (!account.Contacts.Any(c => c.ContactId.Equals(contact.ContactId)))
-            {
-                account.Contacts = new List<ContactModel>() { contact };
-                var updatedAccountResult = await accountService.UpdateAccountAsync(account);
-                isCreatingCorrect = updatedAccountResult.IsDone;
-            }
+            //if (!account.Contacts.Any(c => c.ContactId.Equals(contact.ContactId)))
+            //{
+            //    account.Contacts = new List<ContactModel>() { contact };
+            //    var updatedAccountResult = await accountService.UpdateAccountAsync(account);
+            //    isCreatingCorrect = updatedAccountResult.IsDone;
+            //}
 
-            var acc2 = account;
-            var incident = new IncidentModel() { Accounts = new List<AccountModel>() { acc2 }, Description = model.Description };
+            //AccountModel modelAcc = new AccountModel() { AccountId = account.AccountId, Contacts = account.Contacts, Name = account.Name };
+            var incident = new IncidentModel() { Description = model.Description };
 
-            await incidentRepository.CreateAsync(incident);
+            incident = await incidentRepository.CreateAsync(incident);
+
+            account.IncidentName = incident.Name;
+            await accountService.UpdateAccountAsync(account);
 
             if (isCreatingCorrect)
                 transactionService.Commit();

@@ -19,7 +19,7 @@ namespace bARTSolution.Domain.Data.Context
 
         public TContext CreateDbContext(string[] args)
         {
-            return Create(@"C:\Users\RostyslavBoretskyiNE\Source\Repos\RostyslavBoretskiy\bARTSolution\Web.Api\"
+            return Create(@"C:\Users\User\source\repos\bARTSolution\Web.Api\"
                 /*Directory.GetCurrentDirectory()*/,
                 Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
                 ConnectionStringName, MigrationsAssemblyName);

@@ -12,8 +12,8 @@ namespace bARTSolution.Domain.Data.Entities.Configurations
 
             builder.HasIndex(a => a.Name).IsUnique();
 
-            builder.HasMany(a => a.Contacts).WithOne(c => c.Account);
-            builder.HasOne(a => a.Incident).WithMany(i => i.Accounts);
+            builder.HasMany(a => a.Contacts).WithOne(c => c.Account).HasForeignKey(c => c.AccountId);
+            builder.HasOne(a => a.Incident).WithMany(i => i.Accounts).HasForeignKey(a => a.IncidentName);
         }
     }
 }

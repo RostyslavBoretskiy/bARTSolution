@@ -10,7 +10,7 @@ namespace bARTSolution.Domain.Data.Entities.Configurations
             builder.HasKey(i => i.Name);
             builder.Property(i => i.Name).ValueGeneratedOnAdd();
 
-            builder.HasMany(a => a.Accounts).WithOne(a => a.Incident);
+            builder.HasMany(a => a.Accounts).WithOne(a => a.Incident).HasForeignKey(a => a.IncidentName);
         }
     }
 }
