@@ -7,8 +7,9 @@ namespace bARTSolution.Domain.Infrastructure.Repositories
 {
     public interface IContactRepository
     {
-        IEnumerable<ContactModel> GetAll();
+        Task<IEnumerable<ContactModel>> GetAllAsync();
         Task<ContactModel> GetByIdAsync(int id);
+        Task<ContactModel> GetByEmailAsync(string email);
 
         Task<ContactModel> CreateAsync(ContactModel model);
 

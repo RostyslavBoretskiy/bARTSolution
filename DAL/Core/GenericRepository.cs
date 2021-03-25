@@ -26,17 +26,19 @@ namespace bARTSolution.Domain.Data.Core
 			return await dbSet.FindAsync(key);
 		}
 
-		public IEnumerable<TEntity> Get()
+		public async Task<IEnumerable<TEntity>> GetAsync()
 		{
-			return dbSet
-				.AsNoTracking();
+			return await dbSet
+				.AsNoTracking()
+				.ToListAsync();
 		}
-		public IQueryable<TEntity> Get(Func<TEntity, bool> predicate)
+		public async Task<IEnumerable<TEntity>> GetAsync(Func<TEntity, bool> predicate)
 		{
-			return dbSet
+			return await dbSet
 				.AsNoTracking()
 				.Where(predicate)
-				.AsQueryable();
+				.ToAsyncEnumerable()
+				.ToListAsync();
 		}
 
 		public async Task<TEntity> CreateAsync(TEntity item)
@@ -77,24 +79,26 @@ namespace bARTSolution.Domain.Data.Core
 			return await TrySaveChangesAsync();
 		}
 
-		public IQueryable<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeProperties)
+		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties)
 		{
-			return Include(includeProperties);
+			return await IncludeAsync(includeProperties);
 		}
-		public IQueryable<TEntity> GetWithInclude(Func<TEntity, bool> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(Func<TEntity, bool> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
 		{
-			var query = Include(includeProperties);
+			var query = await IncludeAsync(includeProperties);
 
 			return query
 				.Where(predicate)
 				.AsQueryable();
 		}
 
-		private IQueryable<TEntity> Include(params Expression<Func<TEntity, object>>[] includeProperties)
+		private async Task<IQueryable<TEntity>> IncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties)
 		{
 			IQueryable<TEntity> query = dbSet.AsNoTracking();
-			return includeProperties
-				.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+
+			return await includeProperties
+				.ToAsyncEnumerable()
+				.AggregateAsync(query, (current, includeProperty) => current.Include(includeProperty));
 		}
 
 		private async Task<bool> TrySaveChangesAsync()

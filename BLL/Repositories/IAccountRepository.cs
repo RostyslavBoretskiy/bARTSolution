@@ -7,9 +7,9 @@ namespace bARTSolution.Domain.Infrastructure.Repositories
 {
     public interface IAccountRepository
     {
-        IEnumerable<AccountModel> GetAll();
+        Task<IEnumerable<AccountModel>> GetAllAsync();
         Task<AccountModel> GetByIdAsync(int id);
-        AccountModel GetByName(string name);
+        Task<AccountModel> GetByNameAsync(string name);
 
         Task<AccountModel> CreateAsync(AccountModel model);
 

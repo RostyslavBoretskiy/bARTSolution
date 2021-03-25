@@ -49,9 +49,9 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
             return new ResultModel(result);
         }
 
-        public IEnumerable<AccountModel> GetAll()
+        public async Task<IEnumerable<AccountModel>> GetAllAsync()
         {
-            var result = mapper.Map<IEnumerable<AccountModel>>(accountRepository.Get());
+            var result = mapper.Map<IEnumerable<AccountModel>>(await accountRepository.GetAsync());
 
             return result;
         }
@@ -63,13 +63,12 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
             return mapper.Map<AccountModel>(result);
         }
 
-        public AccountModel GetByName(string name)
+        public async Task<AccountModel> GetByNameAsync(string name)
         {
-            var result = accountRepository
-                .Get(a => a.Name.Equals(name))
-                .FirstOrDefault();
+            var result = await accountRepository
+                .GetAsync(a => a.Name.Equals(name));
 
-            return mapper.Map<AccountModel>(result);
+            return mapper.Map<AccountModel>(result.FirstOrDefault());
         }
 
         public async Task<ResultModel> UpdateAsync(AccountModel model)

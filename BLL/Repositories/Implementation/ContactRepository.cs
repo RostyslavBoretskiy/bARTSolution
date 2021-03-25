@@ -5,6 +5,7 @@ using bARTSolution.Domain.Data.Entities;
 using bARTSolution.Domain.Infrastructure.Models;
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
@@ -47,11 +48,19 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
             return new ResultModel(result);
         }
 
-        public IEnumerable<ContactModel> GetAll()
+        public async Task<IEnumerable<ContactModel>> GetAllAsync()
         {
-            var result = mapper.Map<IEnumerable<ContactModel>>(contactRepository.Get());
+            var result = mapper.Map<IEnumerable<ContactModel>>(await contactRepository.GetAsync());
 
             return result;
+        }
+
+        public async Task<ContactModel> GetByEmailAsync(string email)
+        {
+            var result = await contactRepository
+                .GetAsync(c => c.Email == email);
+
+            return mapper.Map<ContactModel>(result.FirstOrDefault());
         }
 
         public async Task<ContactModel> GetByIdAsync(int id)

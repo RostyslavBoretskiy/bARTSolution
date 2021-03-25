@@ -7,7 +7,7 @@ namespace bARTSolution.Domain.Infrastructure.Repositories
 {
     public interface IIncidentRepository
     {
-        IEnumerable<IncidentModel> GetAll();
+        Task<IEnumerable<IncidentModel>> GetAllAsync();
         Task<IncidentModel> GetByNameAsync(string name);
 
         Task<IncidentModel> CreateAsync(IncidentModel model);

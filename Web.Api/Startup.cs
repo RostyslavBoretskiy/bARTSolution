@@ -1,4 +1,6 @@
+using bARTSolution.Domain.Infrastructure.Extensions;
 using bARTSolution.Web.Api.Extensions.Swagger;
+using bARTSolutionWeb.Domain.Services.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +21,13 @@ namespace bARTSolution.Web.Api
     {
         private static IHttpContextAccessor _httpContextAccessor;
 
-        public static string AppBaseUrl => _httpContextAccessor.HttpContext.Request.Host.ToString();
+        public static string AppBaseUrl => "https://localhost:5001";//_httpContextAccessor.HttpContext.Request.Host.ToString();
 
-        public Startup(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public Startup(IConfiguration configuration/*, IHttpContextAccessor httpContextAccessor*/)
         {
             Configuration = configuration;
 
-            _httpContextAccessor = httpContextAccessor;
+           // _httpContextAccessor = httpContextAccessor;
         }
 
         public IConfiguration Configuration { get; }
@@ -36,6 +38,9 @@ namespace bARTSolution.Web.Api
             services.AddControllers();
 
             services.AddSwagger();
+
+            services.AddApplicationDbContext(Configuration.GetConnectionString("DefaultConnection"));
+            services.RegisterServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

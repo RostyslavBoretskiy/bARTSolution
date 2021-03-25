@@ -47,9 +47,9 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
             return new ResultModel(result);
         }
 
-        public IEnumerable<IncidentModel> GetAll()
+        public async Task<IEnumerable<IncidentModel>> GetAllAsync()
         {
-            var result = mapper.Map<IEnumerable<IncidentModel>>(incidentRepository.Get());
+            var result = mapper.Map<IEnumerable<IncidentModel>>(await incidentRepository.GetAsync());
 
             return result;
         }

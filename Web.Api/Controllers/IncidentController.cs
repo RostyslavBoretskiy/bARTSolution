@@ -1,4 +1,5 @@
 ﻿using bARTSolution.Domain.Services;
+using bARTSolutionWeb.Domain.Services.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -31,8 +32,17 @@ namespace bARTSolution.Web.Api.Controllers
         }
 
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Create([FromBody] CreateIncidentModel model)
         {
+            if (!ModelState.IsValid)
+                return new BadRequestObjectResult(ModelState.Values);
+
+            var result = await incidentService.CreateIncidentAsync(model);
+
+            if (result != null)
+                return new OkObjectResult(result);
+
+            return new BadRequestResult();
         }
 
         // PUT api/<IncidentController>/5

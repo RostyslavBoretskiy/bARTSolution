@@ -13,8 +13,8 @@ namespace bARTSolution.Domain.Data.Core
 
         Task<TEntity> FindAsync(object key);
 
-        IEnumerable<TEntity> Get();
-        IQueryable<TEntity> Get(Func<TEntity, bool> predicate);
+        Task<IEnumerable<TEntity>> GetAsync();
+        Task<IEnumerable<TEntity>> GetAsync(Func<TEntity, bool> predicate);
 
         Task<bool> RemoveAsync(TEntity item);
         Task<bool> RemoveAsync(object key);
@@ -22,7 +22,7 @@ namespace bARTSolution.Domain.Data.Core
 
         Task<bool> UpdateAsync(TEntity item);
 
-        IQueryable<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeProperties);
-        IQueryable<TEntity> GetWithInclude(Func<TEntity, bool> predicate, params Expression<Func<TEntity, object>>[] includeProperties);
+        Task<IQueryable<TEntity>> GetWithIncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties);
+        Task<IQueryable<TEntity>> GetWithIncludeAsync(Func<TEntity, bool> predicate, params Expression<Func<TEntity, object>>[] includeProperties);
     }
 }

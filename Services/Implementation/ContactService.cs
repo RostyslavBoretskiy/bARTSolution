@@ -4,7 +4,7 @@ using bARTSolution.Domain.Infrastructure.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace bARTSolutionWeb.Domain.Services.Implementation
+namespace bARTSolution.Domain.Services.Implementation
 {
     public class ContactService : IContactService
     {
@@ -17,17 +17,40 @@ namespace bARTSolutionWeb.Domain.Services.Implementation
 
         public async Task<ContactModel> CreateContactAsync(ContactModel model)
         {
-            return await contactRepository.CreateAsync(model);
+            var contact = await contactRepository.GetByEmailAsync(model.Email);
+
+            if (contact != null)
+            {
+                var result = await UpdateContactAsync(model);
+                if (result.IsDone)
+                    return contact;
+                else
+                    return null;
+            }
+            else
+            {
+                return await contactRepository.CreateAsync(model);
+            }
         }
 
-        public async Task<ContactModel> GetModelAsync(int id)
+        public async Task<ContactModel> GetContactByEmailAsync(string email)
+        {
+            return await contactRepository.GetByEmailAsync(email);
+        }
+
+        public Task<IEnumerable<ContactModel>> GetContactByEmailsAsync(IEnumerable<string> emails)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public async Task<ContactModel> GetContactByIdAsync(int id)
         {
             return await contactRepository.GetByIdAsync(id);
         }
 
-        public IEnumerable<ContactModel> GetModels()
+        public async Task<IEnumerable<ContactModel>> GetContactsAsync()
         {
-            return contactRepository.GetAll();
+            return await contactRepository.GetAllAsync();
         }
 
         public async Task<ResultModel> UpdateContactAsync(ContactModel model)

@@ -9,7 +9,7 @@ namespace bARTSolution.Domain.Infrastructure.Extensions
 {
     public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection ConfigureBLL(this IServiceCollection services)
+		public static IServiceCollection ConfigureRepositories(this IServiceCollection services)
 		{
 			services.AddRepositories();
 
