@@ -8,9 +8,10 @@ namespace bARTSolution.Domain.Services
 {
     public interface IIncidentService
     {
-        Task<IEnumerable<IncidentModel>> GetIncidents();
-        Task<IncidentModel> GetIncident(string name);
+        Task<IEnumerable<IncidentModel>> GetIncidentsAsync();
+        Task<IncidentModel> GetIncidentAsync(string name);
         Task<IncidentModel> CreateIncidentAsync(CreateIncidentModel model);
-        Task<ResultModel> UpdateIncident(IncidentModel model);
+        Task<ResultModel> UpdateIncidentAsync(IncidentModel model);
+        Task<ResultModel> DeleteIncidentAsync(string name);
     }
 }

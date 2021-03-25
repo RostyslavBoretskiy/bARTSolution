@@ -11,5 +11,6 @@ namespace bARTSolution.Domain.Services
         Task<AccountModel> GetAccountAsync(int id);
         Task<AccountModel> CreateAccountAsync(CreateAccountModel model);
         Task<ResultModel> UpdateAccountAsync(AccountModel model);
+        Task<ResultModel> DeleteAccountAsync(int id);
     }
 }

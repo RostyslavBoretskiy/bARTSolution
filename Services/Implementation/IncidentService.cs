@@ -1,11 +1,9 @@
 ﻿using bARTSolution.Domain.Infrastructure.Models;
 using bARTSolution.Domain.Infrastructure.Repositories;
 using bARTSolutionWeb.Domain.Services.Models;
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
-using bARTSolutionWeb.Domain.Services;
+using System.Threading.Tasks;
 
 namespace bARTSolution.Domain.Services.Implementation
 {
@@ -69,19 +67,24 @@ namespace bARTSolution.Domain.Services.Implementation
             return incident;
         }
 
-        public Task<IncidentModel> GetIncident(string name)
+        public async Task<ResultModel> DeleteIncidentAsync(string name)
         {
-            throw new NotImplementedException();
+            return await incidentRepository.DeleteAsync(name);
         }
 
-        public Task<IEnumerable<IncidentModel>> GetIncidents()
+        public async Task<IncidentModel> GetIncidentAsync(string name)
         {
-            throw new NotImplementedException();
+            return await incidentRepository.GetByNameAsync(name);
         }
 
-        public Task<ResultModel> UpdateIncident(IncidentModel model)
+        public async Task<IEnumerable<IncidentModel>> GetIncidentsAsync()
         {
-            throw new NotImplementedException();
+            return await incidentRepository.GetAllAsync();
+        }
+
+        public async Task<ResultModel> UpdateIncidentAsync(IncidentModel model)
+        {
+            return await incidentRepository.UpdateAsync(model);
         }
     }
 }

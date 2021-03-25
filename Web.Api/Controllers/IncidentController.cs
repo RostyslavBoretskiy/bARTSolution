@@ -1,4 +1,5 @@
-﻿using bARTSolution.Domain.Services;
+﻿using bARTSolution.Domain.Infrastructure.Models;
+using bARTSolution.Domain.Services;
 using bARTSolutionWeb.Domain.Services.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -19,18 +20,32 @@ namespace bARTSolution.Web.Api.Controllers
             this.incidentService = incidentService;
         }
 
+        /// <summary>
+        /// Returns all incidents.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get()
         {
-            return new OkObjectResult(incidentService.GetIncidents());
+            return new OkObjectResult(incidentService.GetIncidentsAsync());
         }
 
+        /// <summary>
+        /// Returns incident by name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [HttpGet("{name}")]
         public IActionResult Get(string name)
         {
-            return new OkObjectResult(incidentService.GetIncident(name));
+            return new OkObjectResult(incidentService.GetIncidentAsync(name));
         }
 
+        /// <summary>
+        /// Create incident.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateIncidentModel model)
         {
@@ -45,16 +60,24 @@ namespace bARTSolution.Web.Api.Controllers
             return new BadRequestResult();
         }
 
-        // PUT api/<IncidentController>/5
+        /// <summary>
+        /// Update incident.
+        /// </summary>
+        /// <param name="model"></param>
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Update([FromBody] IncidentModel model)
         {
+            return new OkObjectResult(await incidentService.UpdateIncidentAsync(model));
         }
 
-        // DELETE api/<IncidentController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        /// <summary>
+        /// Delete incident by name.
+        /// </summary>
+        /// <param name="name"></param>
+        [HttpDelete("{name}")]
+        public async Task<IActionResult> Delete(string name)
         {
+            return new OkObjectResult(await incidentService.DeleteIncidentAsync(name));
         }
     }
 }

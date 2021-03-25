@@ -1,4 +1,6 @@
-﻿using bARTSolution.Domain.Services;
+﻿using bARTSolution.Domain.Infrastructure.Models;
+using bARTSolution.Domain.Services;
+using bARTSolutionWeb.Domain.Services.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -18,34 +20,55 @@ namespace bARTSolution.Web.Api.Controllers
             this.accountService = accountService;
         }
 
+        /// <summary>
+        /// Returns all accounts.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
             return new OkObjectResult(await accountService.GetAccountsAsync());
         }
 
+        /// <summary>
+        /// Returns account by id. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             return new OkObjectResult(await accountService.GetAccountAsync(id));
         }
 
-        // POST api/<AccountController>
+        /// <summary>
+        /// Create new account.
+        /// </summary>
+        /// <param name="model"></param>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Create([FromBody] CreateAccountModel model)
         {
+            return new OkObjectResult(await accountService.CreateAccountAsync(model));
         }
 
-        // PUT api/<AccountController>/5
+        /// <summary>
+        /// Update account.
+        /// </summary>
+        /// <param name="model"></param>
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Update([FromBody] AccountModel model)
         {
+            return new OkObjectResult(await accountService.UpdateAccountAsync(model));
         }
 
-        // DELETE api/<AccountController>/5
+        /// <summary>
+        /// Delete account by id.
+        /// </summary>
+        /// <param name="id"></param>
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            return new OkObjectResult(await accountService.DeleteAccountAsync(id));
         }
     }
 }

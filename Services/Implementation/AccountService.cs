@@ -31,6 +31,11 @@ namespace bARTSolution.Domain.Services.Implementation
             return await accountRepository.CreateAsync(newAccount);
         }
 
+        public async Task<ResultModel> DeleteAccountAsync(int id)
+        {
+            return await accountRepository.DeleteAsync(id);
+        }
+
         public async Task<AccountModel> GetAccountAsync(int id)
         {
             return await accountRepository.GetByIdAsync(id);

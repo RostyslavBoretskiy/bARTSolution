@@ -13,5 +13,6 @@ namespace bARTSolution.Domain.Services
         Task<IEnumerable<ContactModel>> GetContactByEmailsAsync(IEnumerable<string> emails);
         Task<ContactModel> CreateContactAsync(ContactModel model);
         Task<ResultModel> UpdateContactAsync(ContactModel model);
+        Task<ResultModel> DeleteContactAsync(int id);
     }
 }

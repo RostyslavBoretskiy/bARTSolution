@@ -33,6 +33,11 @@ namespace bARTSolution.Domain.Services.Implementation
             }
         }
 
+        public async Task<ResultModel> DeleteContactAsync(int id)
+        {
+            return await contactRepository.DeleteAsync(id);
+        }
+
         public async Task<ContactModel> GetContactByEmailAsync(string email)
         {
             return await contactRepository.GetByEmailAsync(email);
