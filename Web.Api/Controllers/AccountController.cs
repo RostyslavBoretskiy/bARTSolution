@@ -1,15 +1,13 @@
-﻿using bARTSolution.Domain.Infrastructure.Models;
-using bARTSolution.Domain.Services;
+﻿using bARTSolution.Domain.Services;
 using bARTSolutionWeb.Domain.Services.Models;
+
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Threading.Tasks;
 
 namespace bARTSolution.Web.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -27,7 +25,7 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return new OkObjectResult(await accountService.GetAccountsAsync());
+            return Ok(await accountService.GetAccountsAsync());
         }
 
         /// <summary>
@@ -38,7 +36,7 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            return new OkObjectResult(await accountService.GetAccountAsync(id));
+            return Ok(await accountService.GetAccountAsync(id));
         }
 
         /// <summary>
@@ -46,19 +44,17 @@ namespace bARTSolution.Web.Api.Controllers
         /// </summary>
         /// <param name="model"></param>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateAccountModel model)
+        public async Task<IActionResult> Create([FromBody] AccountViewModel model)
         {
-            return new OkObjectResult(await accountService.CreateAccountAsync(model));
-        }
+            if (!ModelState.IsValid)
+                BadRequest(ModelState.Values);
 
-        /// <summary>
-        /// Update account.
-        /// </summary>
-        /// <param name="model"></param>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] AccountModel model)
-        {
-            return new OkObjectResult(await accountService.UpdateAccountAsync(model));
+            var result = await accountService.CreateAccountAsync(model);
+
+            if (result == null)
+                return BadRequest();
+
+            return Ok();
         }
 
         /// <summary>
@@ -68,7 +64,12 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return new OkObjectResult(await accountService.DeleteAccountAsync(id));
+            var result = await accountService.DeleteAccountAsync(id);
+
+            if (!result.IsDone)
+                return BadRequest();
+
+            return Ok();
         }
     }
 }

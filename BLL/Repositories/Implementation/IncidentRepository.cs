@@ -49,7 +49,7 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
 
         public async Task<IEnumerable<IncidentModel>> GetAllAsync()
         {
-            var result = mapper.Map<IEnumerable<IncidentModel>>(await incidentRepository.GetAsync());
+            var result = mapper.Map<IEnumerable<IncidentModel>>(await incidentRepository.GetWithIncludeAsync(i => i.Accounts));
 
             return result;
         }

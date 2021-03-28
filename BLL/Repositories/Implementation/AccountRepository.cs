@@ -51,7 +51,7 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
 
         public async Task<IEnumerable<AccountModel>> GetAllAsync()
         {
-            var result = mapper.Map<IEnumerable<AccountModel>>(await accountRepository.GetAsync());
+            var result = mapper.Map<IEnumerable<AccountModel>>(await accountRepository.GetWithIncludeAsync(a => a.Contacts));
 
             return result;
         }

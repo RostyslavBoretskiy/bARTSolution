@@ -21,9 +21,16 @@ namespace bARTSolution.Domain.Data.Core
 			dbSet = context.Set<TEntity>();
 		}
 
-		public async Task<TEntity> FindAsync(object key)
+		public async Task<TEntity> FindAsync(object key, params string[] paths)
 		{
-			return await dbSet.FindAsync(key);
+			var model = await dbSet.FindAsync(key);
+
+			foreach(var path in paths)
+            {
+				await context.Entry(model).Reference(path).LoadAsync();
+            }
+
+			return model;
 		}
 
 		public async Task<IEnumerable<TEntity>> GetAsync()
@@ -67,7 +74,7 @@ namespace bARTSolution.Domain.Data.Core
 		}
 		public async Task<bool> RemoveAsync(object key)
 		{
-			var entity = await FindAsync(key);
+			var entity = await dbSet.FindAsync(key);
 			dbSet.Remove(entity);
 
 			return await TrySaveChangesAsync();
@@ -79,20 +86,19 @@ namespace bARTSolution.Domain.Data.Core
 			return await TrySaveChangesAsync();
 		}
 
-		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties)
+		public async Task<IEnumerable<TEntity>> GetWithIncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties)
 		{
 			return await IncludeAsync(includeProperties);
 		}
-		public async Task<IQueryable<TEntity>> GetWithIncludeAsync(Func<TEntity, bool> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+		public async Task<IEnumerable<TEntity>> GetWithIncludeAsync(Func<TEntity, bool> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
 		{
 			var query = await IncludeAsync(includeProperties);
 
 			return query
-				.Where(predicate)
-				.AsQueryable();
+				.Where(predicate);
 		}
 
-		private async Task<IQueryable<TEntity>> IncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties)
+		private async Task<IEnumerable<TEntity>> IncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties)
 		{
 			IQueryable<TEntity> query = dbSet.AsNoTracking();
 

@@ -1,15 +1,13 @@
-﻿using bARTSolution.Domain.Infrastructure.Models;
-using bARTSolution.Domain.Services;
+﻿using bARTSolution.Domain.Services;
 using bARTSolutionWeb.Domain.Services.Models;
+
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Threading.Tasks;
 
 namespace bARTSolution.Web.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class IncidentController : ControllerBase
     {
@@ -25,9 +23,9 @@ namespace bARTSolution.Web.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return new OkObjectResult(incidentService.GetIncidentsAsync());
+            return Ok(await incidentService.GetIncidentsAsync());
         }
 
         /// <summary>
@@ -36,9 +34,12 @@ namespace bARTSolution.Web.Api.Controllers
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpGet("{name}")]
-        public IActionResult Get(string name)
+        public async Task<IActionResult> Get(string name)
         {
-            return new OkObjectResult(incidentService.GetIncidentAsync(name));
+            if (string.IsNullOrEmpty(name))
+                BadRequest($"Name can`t be null or empty.");
+
+            return Ok(await incidentService.GetIncidentAsync(name));
         }
 
         /// <summary>
@@ -47,27 +48,17 @@ namespace bARTSolution.Web.Api.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateIncidentModel model)
+        public async Task<IActionResult> Create([FromBody] IncidentViewModel model)
         {
             if (!ModelState.IsValid)
-                return new BadRequestObjectResult(ModelState.Values);
+                return BadRequest(ModelState.Values);
 
             var result = await incidentService.CreateIncidentAsync(model);
 
             if (result != null)
-                return new OkObjectResult(result);
+                return Ok(result);
 
-            return new BadRequestResult();
-        }
-
-        /// <summary>
-        /// Update incident.
-        /// </summary>
-        /// <param name="model"></param>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] IncidentModel model)
-        {
-            return new OkObjectResult(await incidentService.UpdateIncidentAsync(model));
+            return BadRequest();
         }
 
         /// <summary>
@@ -77,7 +68,7 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpDelete("{name}")]
         public async Task<IActionResult> Delete(string name)
         {
-            return new OkObjectResult(await incidentService.DeleteIncidentAsync(name));
+            return Ok(await incidentService.DeleteIncidentAsync(name));
         }
     }
 }

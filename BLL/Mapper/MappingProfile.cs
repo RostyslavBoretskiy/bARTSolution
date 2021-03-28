@@ -2,20 +2,21 @@
 
 using bARTSolution.Domain.Infrastructure.Mapper.Profiles;
 
+using System.Collections.Generic;
+
 namespace bARTSolution.Domain.Infrastructure.Mapper
 {
-    internal static class MappingProfile
+    public static class MappingProfile
     {
-        public static MapperConfiguration InitializeAutoMapper()
+        public static List<Profile> GetDataProfiles()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new IncidentProfile());
-                cfg.AddProfile(new AccountProfile());
-                cfg.AddProfile(new ContactProfile());
-            });
+            var profiles = new List<Profile>();
 
-            return config;
+            profiles.Add(new IncidentProfile());
+            profiles.Add(new AccountProfile());
+            profiles.Add(new ContactProfile());
+
+            return profiles;
         }
     }
 }

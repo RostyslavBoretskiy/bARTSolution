@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 using System;
+using System.IO;
 
 namespace bARTSolution.Domain.Data.Context
 {
@@ -19,8 +20,7 @@ namespace bARTSolution.Domain.Data.Context
 
         public TContext CreateDbContext(string[] args)
         {
-            return Create(@"C:\Users\User\source\repos\bARTSolution\Web.Api\"
-                /*Directory.GetCurrentDirectory()*/,
+            return Create(@$"{Directory.GetCurrentDirectory()}\..\Web.Api\",
                 Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
                 ConnectionStringName, MigrationsAssemblyName);
         }

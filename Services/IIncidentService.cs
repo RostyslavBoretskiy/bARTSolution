@@ -10,7 +10,7 @@ namespace bARTSolution.Domain.Services
     {
         Task<IEnumerable<IncidentModel>> GetIncidentsAsync();
         Task<IncidentModel> GetIncidentAsync(string name);
-        Task<IncidentModel> CreateIncidentAsync(CreateIncidentModel model);
+        Task<IncidentModel> CreateIncidentAsync(IncidentViewModel model);
         Task<ResultModel> UpdateIncidentAsync(IncidentModel model);
         Task<ResultModel> DeleteIncidentAsync(string name);
     }

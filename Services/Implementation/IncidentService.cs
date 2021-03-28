@@ -1,9 +1,11 @@
-﻿using bARTSolution.Domain.Infrastructure.Models;
+﻿using AutoMapper;
+
+using bARTSolution.Domain.Infrastructure.Models;
 using bARTSolution.Domain.Infrastructure.Repositories;
 using bARTSolutionWeb.Domain.Services.Models;
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace bARTSolution.Domain.Services.Implementation
@@ -12,71 +14,42 @@ namespace bARTSolution.Domain.Services.Implementation
     {
         private readonly IIncidentRepository incidentRepository;
         private readonly IAccountService accountService;
-        private readonly IContactService contactService;
         private readonly ITransactionService transactionService;
+
+        private readonly IMapper mapper;
 
         public IncidentService(
             IIncidentRepository incidentRepository,
             IAccountService accountService,
-            IContactService contactService,
-            ITransactionService transactionService)
+            ITransactionService transactionService,
+            IMapper mapper)
         {
             this.incidentRepository = incidentRepository;
             this.accountService = accountService;
-            this.contactService = contactService;
             this.transactionService = transactionService;
+
+            this.mapper = mapper;
         }
 
-        public async Task<IncidentModel> CreateIncidentAsync(CreateIncidentModel model)
+        public async Task<IncidentModel> CreateIncidentAsync(IncidentViewModel model)
         {
-            //transactionService.Begin();
+            transactionService.Begin();
 
-            bool isCreatingCorrect = false;
-
-            var account222 = await accountService.GetAccountsAsync();
-            var account = account222.FirstOrDefault(f => f.Name == model.AccountName);
-            var contact222 = await contactService.GetContactsAsync();
-            var contact = contact222.FirstOrDefault(f => f.Email == model.Email);
+            var account = await accountService.GetAccountAsync(model.AccountName);
 
             if (account == null)
-                return null;
+                throw new NullReferenceException($"Account with email: {model.Email} - not exist.");
 
-            var contactModel = new ContactModel()
-            {
-                AccountId = account.AccountId,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName
-            };
-            if (contact == null)
-            {
-                contact = await contactService.CreateContactAsync(contactModel);
-                if (contact != null)
-                    isCreatingCorrect = true;
-            }
-            else
-            {
-                contactModel.ContactId = contact.ContactId;
-                var updatedContactResult = await contactService.UpdateContactAsync(contactModel);
-                isCreatingCorrect = updatedContactResult.IsDone;
-            }
+            var contactVM = mapper.Map<ContactViewModel>(model);
+            var contactHandlerResult = await accountService.AddContact(model.AccountName, contactVM);
 
-            //if (!account.Contacts.Any(c => c.ContactId.Equals(contact.ContactId)))
-            //{
-            //    account.Contacts = new List<ContactModel>() { contact };
-            //    var updatedAccountResult = await accountService.UpdateAccountAsync(account);
-            //    isCreatingCorrect = updatedAccountResult.IsDone;
-            //}
-
-            //AccountModel modelAcc = new AccountModel() { AccountId = account.AccountId, Contacts = account.Contacts, Name = account.Name };
             var incident = new IncidentModel() { Description = model.Description };
-
-            incident = await incidentRepository.CreateAsync(incident);
+            incident = await incidentRepository.CreateAsync(incident); 
 
             account.IncidentName = incident.Name;
-            await accountService.UpdateAccountAsync(account);
+            var accountHandlerResult = await accountService.UpdateAccountAsync(account);
 
-            if (isCreatingCorrect)
+            if (contactHandlerResult.IsDone && accountHandlerResult.IsDone)
                 transactionService.Commit();
             else
                 transactionService.Rollback();

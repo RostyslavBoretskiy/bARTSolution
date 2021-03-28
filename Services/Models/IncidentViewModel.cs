@@ -2,7 +2,7 @@
 
 namespace bARTSolutionWeb.Domain.Services.Models
 {
-    public class CreateIncidentModel
+    public class IncidentViewModel
     {
         [Required]
         public string AccountName { get; set; }

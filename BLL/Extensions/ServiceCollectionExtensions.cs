@@ -1,5 +1,4 @@
 ﻿using bARTSolution.Domain.Data.Context;
-using bARTSolution.Domain.Infrastructure.Extensions.Mapper;
 using bARTSolution.Domain.Infrastructure.Extensions.Services;
 
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +11,6 @@ namespace bARTSolution.Domain.Infrastructure.Extensions
 		public static IServiceCollection ConfigureRepositories(this IServiceCollection services)
 		{
 			services.AddRepositories();
-
-			services.AddMapper();
 
 			return services;
 		}

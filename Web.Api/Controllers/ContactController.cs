@@ -1,6 +1,8 @@
 ﻿using bARTSolution.Domain.Infrastructure.Models;
 using bARTSolution.Domain.Services;
+
 using Microsoft.AspNetCore.Mvc;
+
 using System.Threading.Tasks;
 
 namespace bARTSolution.Web.Api.Controllers
@@ -23,7 +25,7 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return new OkObjectResult(await contactService.GetContactsAsync());
+            return Ok(await contactService.GetContactsAsync());
         }
 
         /// <summary>
@@ -34,7 +36,7 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpGet("{email}")]
         public async Task<IActionResult> Get(string email)
         {
-            return new OkObjectResult(await contactService.GetContactByEmailAsync(email));
+            return Ok(await contactService.GetContactByEmailAsync(email));
         }
 
         /// <summary>
@@ -44,18 +46,15 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ContactModel model)
         {
-            return new OkObjectResult(await contactService.CreateContactAsync(model));
-        }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.Values);
 
-        /// <summary>
-        /// Update contact.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="model"></param>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] ContactModel model)
-        {
-            return new OkObjectResult(await contactService.UpdateContactAsync(model));
+            var result = await contactService.CreateContactAsync(model);
+
+            if (result != null)
+                return Ok(result);
+
+            return BadRequest();
         }
 
         /// <summary>
@@ -65,7 +64,7 @@ namespace bARTSolution.Web.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return new OkObjectResult(await contactService.DeleteContactAsync(id));
+            return Ok(await contactService.DeleteContactAsync(id));
         }
     }
 }

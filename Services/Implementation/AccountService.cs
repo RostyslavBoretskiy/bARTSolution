@@ -1,11 +1,14 @@
-﻿using bARTSolution.Domain.Infrastructure.Models;
+﻿using AutoMapper;
+
+using bARTSolution.Domain.Infrastructure.Models;
 using bARTSolution.Domain.Infrastructure.Repositories;
-using bARTSolutionWeb.Domain.Services;
 using bARTSolutionWeb.Domain.Services.Models;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace bARTSolution.Domain.Services.Implementation
 {
@@ -14,21 +17,54 @@ namespace bARTSolution.Domain.Services.Implementation
         private readonly IAccountRepository accountRepository;
         private readonly IContactService contactService;
 
-        public AccountService(IAccountRepository accountRepository, IContactService contactService)
+        private readonly IMapper mapper;
+
+        public AccountService(
+            IAccountRepository accountRepository, 
+            IContactService contactService,
+            IMapper mapper)
         {
             this.accountRepository = accountRepository;
             this.contactService = contactService;
+
+            this.mapper = mapper;
         }
 
-        public async Task<AccountModel> CreateAccountAsync(CreateAccountModel model)
+        public async Task<ResultModel> AddContact(string accountName, ContactViewModel contactVM)
         {
-            if (model.ContactEmails.Count() < 1)
-                return null;
+            if (contactVM == null)
+                throw new NullReferenceException($"{nameof(contactVM)} can not be null.");
 
-            var contacts = await contactService.GetContactByEmailsAsync(model.ContactEmails);
-            var newAccount = new AccountModel() { Contacts = contacts, IncidentName = model.IncidentName, Name = model.Name };
+            var account = await GetAccountAsync(accountName);
+            var contact = await contactService.GetContactByEmailAsync(contactVM.Email);
 
-            return await accountRepository.CreateAsync(newAccount);
+            if (account == null)
+                return new ResultModel(false);
+
+            var id = contact.ContactId;
+            contact = mapper.Map<ContactModel>(contactVM);
+            contact.ContactId = id;
+            contact.AccountId = account.AccountId;
+
+            if (contact == null)
+                await contactService.CreateContactAsync(contact);
+            else
+                await contactService.UpdateContactAsync(contact);
+
+            return new ResultModel();
+        }
+
+        public async Task<AccountModel> CreateAccountAsync(AccountViewModel model)
+        {
+            var contact = await contactService.GetContactByEmailAsync(model.Email);
+            var newAccount = new AccountModel() { Name = model.Name };
+
+            var createdResult = await accountRepository.CreateAsync(newAccount);
+
+            contact.AccountId = createdResult.AccountId;
+            await contactService.UpdateContactAsync(contact);
+
+            return createdResult;
         }
 
         public async Task<ResultModel> DeleteAccountAsync(int id)
@@ -54,6 +90,11 @@ namespace bARTSolution.Domain.Services.Implementation
         public async Task<ResultModel> UpdateAccountAsync(AccountModel model)
         {
             return await accountRepository.UpdateAsync(model);
+        }
+
+        public Task<ResultModel> UpsertAccountAsync(AccountModel model)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
