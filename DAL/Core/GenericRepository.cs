@@ -1,7 +1,7 @@
 ﻿using bARTSolution.Domain.Data.Context;
 
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,6 +97,39 @@ namespace bARTSolution.Domain.Data.Core
 			return query
 				.Where(predicate);
 		}
+		public async Task<IEnumerable<TEntity>> GetWithIncludeAsync<TProperty>(Expression<Func<TEntity, object>> selector, params Expression<Func<object, TProperty>>[] include)
+		{
+			var query = await ThenIncludeAsync(selector, include);
+
+			return query;
+		}
+		public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> predicate = null,
+										  Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+										  Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+										  bool disableTracking = true)
+		{
+			IQueryable<TEntity> query = dbSet;
+			if (disableTracking)
+			{
+				query = query.AsNoTracking();
+			}
+			if (include != null)
+			{
+				query = include(query);
+			}
+			if (predicate != null)
+			{
+				query = query.Where(predicate);
+			}
+			if (orderBy != null)
+			{
+				return orderBy(query);
+			}
+			else
+			{
+				return query;
+			}
+		}
 
 		private async Task<IEnumerable<TEntity>> IncludeAsync(params Expression<Func<TEntity, object>>[] includeProperties)
 		{
@@ -105,6 +138,16 @@ namespace bARTSolution.Domain.Data.Core
 			return await includeProperties
 				.ToAsyncEnumerable()
 				.AggregateAsync(query, (current, includeProperty) => current.Include(includeProperty));
+		}
+
+		private async Task<IEnumerable<TEntity>> ThenIncludeAsync<TProperty>(Expression<Func<TEntity, object>> selector, params Expression<Func<object, TProperty>>[] include)
+		{
+			var query = dbSet.AsNoTracking().Include(selector);
+
+			foreach (var i in include)
+				query.ThenInclude(i);
+
+			return await query.ToListAsync();
 		}
 
 		private async Task<bool> TrySaveChangesAsync()

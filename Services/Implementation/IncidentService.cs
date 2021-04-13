@@ -69,6 +69,7 @@ namespace bARTSolution.Domain.Services.Implementation
 
         public async Task<IEnumerable<IncidentModel>> GetIncidentsAsync()
         {
+
             return await incidentRepository.GetAllAsync();
         }
 

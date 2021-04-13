@@ -3,7 +3,7 @@
 using bARTSolution.Domain.Data.Core;
 using bARTSolution.Domain.Data.Entities;
 using bARTSolution.Domain.Infrastructure.Models;
-
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -49,7 +49,8 @@ namespace bARTSolution.Domain.Infrastructure.Repositories.Implementation
 
         public async Task<IEnumerable<IncidentModel>> GetAllAsync()
         {
-            var result = mapper.Map<IEnumerable<IncidentModel>>(await incidentRepository.GetWithIncludeAsync(i => i.Accounts));
+            var result = mapper.Map<IEnumerable<IncidentModel>>(await incidentRepository.GetWithIncludeAsync<Account>(i => i.Accounts, x => (x as Account).Contacts));
+            var a =  await incidentRepository.Get(include: x => x.Include(x => x.Accounts).ThenInclude(x => x.Contacts)).ToListAsync();
 
             return result;
         }
